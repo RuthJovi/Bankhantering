@@ -12,8 +12,8 @@ namespace Bankhantering
         List<Customer> customers = new List<Customer>();
         public class Customer
         {
-            public string name; public int money;
-            public Customer(string newName, int newMoney)
+            public string name; public int money; //every user has a name and account balance
+            public Customer(string newName, int newMoney) 
             {
                 name = newName; money = newMoney;
             }
@@ -21,12 +21,11 @@ namespace Bankhantering
         public void MainMenu()
         {
             bool running = true;
-            while (running)
+            while (running) 
             {
                 Console.Clear();
                 Console.WriteLine("MAIN MENU"); Console.WriteLine();
-                Console.WriteLine("Welcome to the bank");
-                Console.WriteLine();
+                Console.WriteLine("Welcome to the bank?\n" + "WHat would you like to do?\n" + "1. Manage customers\n" + "2. Manage accounts");
 
                 switch (Console.ReadLine())
                 {
@@ -45,6 +44,16 @@ namespace Bankhantering
         {
             Console.ReadKey(); Console.WriteLine("Press to continue");
         }  
+        public void PrintCustomers(List<Customer> list)
+        {
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            for (int i = 0; i < list.Count; i++)
+            {
+                Console.WriteLine($"CUSTOMER {i + 1} - Name: {list[i].name} || Balance: {list[i].money} SEK");
+            }
+        } //prints an ordered list of the customers, along with their name and money
+
+
         public void ManageCustomers()
         {
             bool running = true;
@@ -58,11 +67,12 @@ namespace Bankhantering
                 {
                     case "1":
                         PrintCustomers(customers);
+                        PressToContinue();
                         break;
                     case "2":
                         ;
                         AddCustomer(customers);
-                        PrintCustomers(customers);
+                        
                         break;
                     case "3":
                         RemoveCustomer(customers);
@@ -76,15 +86,6 @@ namespace Bankhantering
         } //the menu for "manage customers"
 
         //functions that are accessed from the "manage customers" menu
-        public void PrintCustomers(List<Customer> list)
-        {
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            for (int i = 0; i < list.Count; i++)
-            {
-                Console.WriteLine($"CUSTOMER {i + 1} - Name: {list[i].name} || Money: {list[i].money}");
-            }
-            PressToContinue();
-        } //prints an ordered list of the customers, along with their name and money
         public void AddCustomer(List<Customer> list)
         {
             Console.WriteLine("Add a name for the new customer:");
@@ -92,16 +93,14 @@ namespace Bankhantering
             Console.WriteLine($"How much money should {newCustomer.name} start out with?");
             newCustomer.money = Convert.ToInt32(Console.ReadLine());
             Console.WriteLine($"{newCustomer.name} was added with {newCustomer.money} crowns in their account.");
-            list.Add(newCustomer);
-            PressToContinue();
+            list.Add(newCustomer); PrintCustomers(list); PressToContinue();
         } //allows the user to add a customer to the list
         public void RemoveCustomer(List<Customer> list)
         {
-            PrintCustomers(list);
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("Which customer do you wish to remove? Answer with the index");
+            PrintCustomers(list); Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Which customer do you wish to remove? Answer with the customers index:");
             list.RemoveAt(Convert.ToInt32(Console.ReadLine()) - 1); //removes the object at the chosen index, removes 1 since lists start at 0
-            PressToContinue();
+            PrintCustomers(list); PressToContinue();
         }  //allows the user to remove a customer by index
 
 
@@ -124,7 +123,7 @@ namespace Bankhantering
                         ChangeMoney(customers);
                         break;
                     case "2":
-                        // TransferMoney(customers);
+                        TransferMoney(customers);
                         break;
                     case "3":
                         MainMenu();
@@ -136,13 +135,23 @@ namespace Bankhantering
         //functions that are accessed from the "manage accounts" menu
         public void ChangeMoney(List<Customer> list)
         {
-            Console.ForegroundColor = ConsoleColor.White; PrintCustomers(list);
-            Console.WriteLine("Which account do you wish to alter?");
-            Console.WriteLine("Answer with the index of the customer and then the amount of money you'd like to remove, ex: 40 to add 40 or -6 to remove 6");
-            int index = Convert.ToInt32(Console.ReadLine()) - 1; int change = Convert.ToInt32(Console.ReadLine());
-            list[index].money = list[index].money + change;
-            PrintCustomers(list);
-        }
-
+            PrintCustomers(list); Console.ForegroundColor = ConsoleColor.White; 
+            Console.WriteLine("Which account do you wish to alter? Answer with the customers index:"); 
+            int index = Convert.ToInt32(Console.ReadLine()) - 1;
+            Console.WriteLine($"How much money do you wish to add/remove from {list[index].name}'s account? Ex: Entering 40 equals +40, -60 equals -60");
+            int change = Convert.ToInt32(Console.ReadLine()); list[index].money = list[index].money + change;
+            PrintCustomers(list); PressToContinue();
+        }  //allows the user to add/remove money from a single account
+        public void TransferMoney(List<Customer> list)
+        {
+            PrintCustomers(list); Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Which customer do you wish to take money from? Answer with the customers index:");
+            int index = Convert.ToInt32(Console.ReadLine()) - 1;
+            Console.WriteLine($"How much money do you want to take from {list[index].name}'s account?");
+            int change = Convert.ToInt32(Console.ReadLine()); list[index].money = list[index].money - change;
+            Console.WriteLine("Now choose a customer to deposit the money to:");
+            int index2 = Convert.ToInt32(Console.ReadLine()) - 1; list[index2].money = list[index2].money + change;
+            PrintCustomers(list); PressToContinue();
+        } //allows the user to transfer money between two accounts
     }
 }
